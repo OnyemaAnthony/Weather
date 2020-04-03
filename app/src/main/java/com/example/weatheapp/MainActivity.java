@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -15,6 +14,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,11 +25,17 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
-    private RequestQueue queue;
     private AlertDialog.Builder builder;
     private AlertDialog dialog;
     private TextView temp;
@@ -47,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        queue = Volley.newRequestQueue(this);
+
         Objects.requireNonNull(getSupportActionBar()).setElevation(0);
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -60,24 +66,14 @@ public class MainActivity extends AppCompatActivity {
         cityText = findViewById(R.id.city_text);
 
 
-
-
-
-         getWeather("Enugu");
-
-
-
-
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                searchDialog();
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
 
 
             }
         });
+
     }
 
     @Override
@@ -103,74 +99,29 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void searchDialog(){
-        builder = new AlertDialog.Builder(this);
+    public void getWeather(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Api.BASE_URL)
+                .addCallAdapterFactory(GsonConverterFactory.create())
+                .build();
 
-        View view = getLayoutInflater().inflate(R.layout.search,null);
+        Api api = retrofit.create(Api.class);
+        Call<List<Weather>> call = api.getWeather();
 
-        final EditText searchText = view.findViewById(R.id.search_text);
-        Button submit = view.findViewById(R.id.submit_search);
-        submit.setOnClickListener(new View.OnClickListener() {
+        call.enqueue(new Callback<List<Weather>>() {
             @Override
-            public void onClick(View v) {
-                if (!searchText.getText().toString().isEmpty()){
-                    getWeather(searchText.getText().toString());
-                    dialog.dismiss();
+            public void onResponse(Call<List<Weather>> call, Response<List<Weather>> response) {
+                Log.d("jason", "onResponse: "+response.body());
+            }
 
-                }else {
-
-                    Snackbar.make(v,"Enter a valid city name",Snackbar.LENGTH_SHORT).show();
-
-                }
-
-
-
+            @Override
+            public void onFailure(Call<List<Weather>> call, Throwable t) {
 
             }
         });
 
-        builder.setView(view);
-        dialog = builder.create();
-        dialog.show();
+    }
 
 
     }
 
-    public void getWeather(String city){
-
-        cityText.setText(city);
-        String url = "http://api.openweathermap.org/data/2.5/weather?q="+city+"&units=metric&appid=179f48e2a75510a77c55de8f02e18af2&lang=en";
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                // Log.d("JASON", "onResponse: "+ response.toString());
-
-                JSONObject main = null;
-                try {
-                    main = response.getJSONObject("main");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    temp.setText("Temp: "+main.getString("temp")+"C");
-                    minTemp.setText("Mim_Temp: "+main.getString("temp_min")+"C");
-                    humidity.setText("Max_Temp: "+main.getString("temp_max")+"C");
-                    maxTemp.setText("Humidity: "+main.getString("humidity"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-
-            }
-        });
-        queue.add(jsonObjectRequest);
-
-    }
-}
