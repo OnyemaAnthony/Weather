@@ -2,13 +2,8 @@ package com.example.weatheapp;
 
 import android.os.Bundle;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,12 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Objects;
@@ -43,8 +33,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView maxTemp;
     private TextView humidity;
     private TextView cityText;
-   // private static final String APPI_KEY = "179f48e2a75510a77c55de8f02e18af2";
-
+    private static final String TAG = "MainActivity";
+    private static final String APPI_ID = "179f48e2a75510a77c55de8f02e18af2";
+    //private static final String BASE_URL = "http://api.openweathermap.org/";
+    private String city = "Enugu";
 
 
     @Override
@@ -57,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setElevation(0);
 
         FloatingActionButton fab = findViewById(R.id.fab);
+        getWeather();
 
 
         temp = findViewById(R.id.temperature);
@@ -92,36 +85,38 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_search) {
-            searchDialog();
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public void getWeather(){
+    public void getWeather() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Api.BASE_URL)
-                .addCallAdapterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        Api api = retrofit.create(Api.class);
-        Call<List<Weather>> call = api.getWeather();
 
-        call.enqueue(new Callback<List<Weather>>() {
+        Api api = retrofit.create(Api.class);
+        Call<WeatherApi> call = api.getWeather();
+        call.enqueue(new Callback<WeatherApi>() {
             @Override
-            public void onResponse(Call<List<Weather>> call, Response<List<Weather>> response) {
-                Log.d("jason", "onResponse: "+response.body());
+            public void onResponse(Call<WeatherApi> call, Response<WeatherApi> response) {
+                //response is returnin null
+                Log.d(TAG, "onResponse: "+response.body());
             }
 
             @Override
-            public void onFailure(Call<List<Weather>> call, Throwable t) {
+            public void onFailure(Call<WeatherApi> call, Throwable t) {
 
             }
         });
 
-    }
 
 
+
     }
+}
 
