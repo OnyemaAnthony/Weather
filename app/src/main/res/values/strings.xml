@@ -11,4 +11,8 @@
     <string name="hint_search">Enter a city name</string>
     <string name="submit">Submit</string>
     <string name="humdty">Humidity: </string>
+    <string name="minimum_temp">Min_Temp: </string>
+    <string name="temp">Temp: </string>
+    <string name="maximum_temp">Max_Temp: </string>
+    <string name="degree_celsius"> C</string>
 </resources>

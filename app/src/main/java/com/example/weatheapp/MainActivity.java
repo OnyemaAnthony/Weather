@@ -1,5 +1,6 @@
 package com.example.weatheapp;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -36,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView cityText;
     private static final String TAG = "MainActivity";
 
-
        @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,13 +49,11 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionButton fab = findViewById(R.id.fab);
         getWeather("Enugu");
 
-
         temp = findViewById(R.id.temperature);
         minTemp = findViewById(R.id.temperature_min);
         maxTemp = findViewById(R.id.temperature_max);
         humidity = findViewById(R.id.humidity);
         cityText = findViewById(R.id.city_text);
-
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,20 +99,18 @@ public class MainActivity extends AppCompatActivity {
         Api api = retrofit.create(Api.class);
         Call<WeatherApi> call = api.getWeather(SECOND_URL);
         call.enqueue(new Callback<WeatherApi>() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onResponse(Call<WeatherApi> call, Response<WeatherApi> response) {
                 Log.d(TAG, "onResponse: "+response.isSuccessful());
 
                 if (response.isSuccessful()){
-
                     WeatherApi weatherResponse = response.body();
 
-                    Log.d(TAG, "onResponse: "+weatherResponse.main.getTemp_min());
-
-                 temp.setText(weatherResponse.main.getTemp());
-                 minTemp.setText(weatherResponse.main.getTemp_min());
-                 maxTemp.setText(weatherResponse.main.getTemp_max());
-                 humidity.setText(weatherResponse.main.getHumidity());
+                 temp.setText(getString(R.string.temp)+ weatherResponse.main.getTemp()+getString(R.string.degree_celsius));
+                 minTemp.setText(getString(R.string.minimum_temp)+weatherResponse.main.getTemp_min()+getString(R.string.degree_celsius));
+                 maxTemp.setText(getString(R.string.maximum_temp)+weatherResponse.main.getTemp_max()+getString(R.string.degree_celsius));
+                 humidity.setText(getString(R.string.humdty)+weatherResponse.main.getHumidity()+getString(R.string.degree_celsius));
 
                 }
             }
@@ -139,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!searchText.getText().toString().isEmpty()){
                     getWeather(searchText.getText().toString());
+                    cityText.setText(searchText.getText().toString());
                     dialog.dismiss();
 
                 }else {
@@ -149,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
         builder.setView(view);
         dialog = builder.create();
         dialog.show();
-
     }
 }
 
