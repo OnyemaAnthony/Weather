@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                  temp.setText(getString(R.string.temp)+ weatherResponse.main.getTemp()+getString(R.string.degree_celsius));
                  minTemp.setText(getString(R.string.minimum_temp)+weatherResponse.main.getTemp_min()+getString(R.string.degree_celsius));
                  maxTemp.setText(getString(R.string.maximum_temp)+weatherResponse.main.getTemp_max()+getString(R.string.degree_celsius));
-                 humidity.setText(getString(R.string.humdty)+weatherResponse.main.getHumidity()+getString(R.string.degree_celsius));
+                 humidity.setText(getString(R.string.humdty)+weatherResponse.main.getHumidity());
 
                 }
             }
