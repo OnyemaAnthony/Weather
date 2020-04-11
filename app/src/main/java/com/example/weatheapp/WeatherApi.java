@@ -1,34 +1,37 @@
 package com.example.weatheapp;
 
+
+import android.util.Log;
+
+import java.util.List;
+
 public class WeatherApi {
-    private String temp;
-    private String temp_min;
-    private String temp_max;
-    private String humidity;
-    static String city = "Enugu";
+
+
+    public Main main;
 
 
 
-    public WeatherApi(String temp, String temp_min, String temp_max, String humidity) {
-        this.temp = temp;
-        this.temp_min = temp_min;
-        this.temp_max = temp_max;
-        this.humidity = humidity;
-    }
+    public class Main {
+        public String temp;
+        public String humidity;
+        public String temp_min;
+        public String temp_max;
 
-    public String getTemp() {
-        return temp;
-    }
+        public String getTemp() {
+            return temp;
+        }
 
-    public String getTemp_min() {
-        return temp_min;
-    }
+        public String getHumidity() {
+            return humidity;
+        }
 
-    public String getTemp_max() {
-        return temp_max;
-    }
+        public String getTemp_min() {
+            return temp_min;
+        }
 
-    public String getHumidity() {
-        return humidity;
+        public String getTemp_max() {
+            return temp_max;
+        }
     }
 }

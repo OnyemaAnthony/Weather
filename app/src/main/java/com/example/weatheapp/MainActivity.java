@@ -3,7 +3,7 @@ package com.example.weatheapp;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.gson.Gson;
+import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,9 +13,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.util.List;
 import java.util.Objects;
 
 import retrofit2.Call;
@@ -34,12 +35,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView humidity;
     private TextView cityText;
     private static final String TAG = "MainActivity";
-    private static final String APPI_ID = "179f48e2a75510a77c55de8f02e18af2";
-    //private static final String BASE_URL = "http://api.openweathermap.org/";
-    private String city = "Enugu";
 
 
-    @Override
+       @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -49,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setElevation(0);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        getWeather();
+        getWeather("Enugu");
 
 
         temp = findViewById(R.id.temperature);
@@ -62,8 +60,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
+                searchDalog();
             }
         });
 
@@ -85,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_search) {
+            searchDalog();
 
             return true;
         }
@@ -92,30 +90,65 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void getWeather() {
+    public void getWeather(String city) {
+               String SECOND_URL = "weather?q="+city+"&units=metric&appid=179f48e2a75510a77c55de8f02e18af2&lang=en";
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Api.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-
         Api api = retrofit.create(Api.class);
-        Call<WeatherApi> call = api.getWeather();
+        Call<WeatherApi> call = api.getWeather(SECOND_URL);
         call.enqueue(new Callback<WeatherApi>() {
             @Override
             public void onResponse(Call<WeatherApi> call, Response<WeatherApi> response) {
-                //response is returnin null
-                Log.d(TAG, "onResponse: "+response.body());
+                Log.d(TAG, "onResponse: "+response.isSuccessful());
+
+                if (response.isSuccessful()){
+
+                    WeatherApi weatherResponse = response.body();
+
+                    Log.d(TAG, "onResponse: "+weatherResponse.main.getTemp_min());
+
+                 temp.setText(weatherResponse.main.getTemp());
+                 minTemp.setText(weatherResponse.main.getTemp_min());
+                 maxTemp.setText(weatherResponse.main.getTemp_max());
+                 humidity.setText(weatherResponse.main.getHumidity());
+
+                }
             }
 
             @Override
             public void onFailure(Call<WeatherApi> call, Throwable t) {
+                Toast.makeText(getApplicationContext(),"Error: "+t.getMessage(),Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onFailure: "+t.getMessage());
 
             }
         });
 
+    }
+    private void searchDalog(){
+        builder = new AlertDialog.Builder(this);
 
+        View view = getLayoutInflater().inflate(R.layout.search,null,false);
+        TextView searchText = view.findViewById(R.id.search_text);
+        Button searchButton = view.findViewById(R.id.submit_search);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!searchText.getText().toString().isEmpty()){
+                    getWeather(searchText.getText().toString());
+                    dialog.dismiss();
 
+                }else {
+                    Snackbar.make(v,"Enter a valid city name",Snackbar.LENGTH_SHORT).show();
+                }
+            }
+        });
+        builder.setView(view);
+        dialog = builder.create();
+        dialog.show();
 
     }
 }
