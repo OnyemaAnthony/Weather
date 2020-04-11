@@ -7,10 +7,7 @@ import java.util.List;
 
 public class WeatherApi {
 
-
     public Main main;
-
-
 
     public class Main {
         public String temp;
