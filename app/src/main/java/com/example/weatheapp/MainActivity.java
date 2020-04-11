@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView humidity;
     private TextView cityText;
     private static final String TAG = "MainActivity";
+    private String enuguCity = "Enugu";
 
        @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setElevation(0);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        getWeather("Enugu");
+        getWeather(enuguCity);
 
         temp = findViewById(R.id.temperature);
         minTemp = findViewById(R.id.temperature_min);
@@ -102,24 +103,20 @@ public class MainActivity extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void onResponse(Call<WeatherApi> call, Response<WeatherApi> response) {
-                Log.d(TAG, "onResponse: "+response.isSuccessful());
 
                 if (response.isSuccessful()){
-                    WeatherApi weatherResponse = response.body();
 
+                    WeatherApi weatherResponse = response.body();
                  temp.setText(getString(R.string.temp)+ weatherResponse.main.getTemp()+getString(R.string.degree_celsius));
                  minTemp.setText(getString(R.string.minimum_temp)+weatherResponse.main.getTemp_min()+getString(R.string.degree_celsius));
                  maxTemp.setText(getString(R.string.maximum_temp)+weatherResponse.main.getTemp_max()+getString(R.string.degree_celsius));
                  humidity.setText(getString(R.string.humdty)+weatherResponse.main.getHumidity());
-
                 }
             }
 
             @Override
             public void onFailure(Call<WeatherApi> call, Throwable t) {
                 Toast.makeText(getApplicationContext(),"Error: "+t.getMessage(),Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "onFailure: "+t.getMessage());
-
             }
         });
 
